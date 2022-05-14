@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 /**
  * Class Subscription
  * @package App\Model
+ * @mixin Builder
  */
 class Subscription extends Model
 {

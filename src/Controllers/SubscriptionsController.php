@@ -9,7 +9,7 @@ use App\Model\Subscription;
  * Class SubscriptionsController
  * @package App\Controllers
  */
-class SubscriptionsController
+class SubscriptionsController extends AbstractAccessController
 {
     /**
      * @param string $params
@@ -17,6 +17,8 @@ class SubscriptionsController
      */
     public function subscriptionList(string $params = '') : View
     {
+        $this->checkAccess(10);
+
         $pagination = new Pagination('Subscription', $params);
 
         return new View('admin.view.subscriptions', ['title' => 'Подписки', 'subscriptions' => $pagination->getData(),
@@ -32,11 +34,11 @@ class SubscriptionsController
         $errors = [];
         $subscription = Subscription::getByNonce($nonce);
 
-        if (!empty($subscription->email)) {
+        if ($subscription && !empty($subscription->email)) {
             $user = User::getByEmail($subscription->email);
 
             if ($user && $user->subscribed == 1) {
-                User::setSubscribed($user->id, 0);
+                User::unsubscribe($user->id);
             }
 
             Subscription::removeById($subscription->id);
@@ -52,16 +54,18 @@ class SubscriptionsController
      */
     public function subscriptionDelete(int $id)
     {
+        $this->checkAccess(10);
+
         $email = Subscription::getEmailById($id);
 
         $user = User::getByEmail($email);
 
         if (!empty($user) && $user->subscribed == 1) {
-            User::setSubscribed($user->id, 0);
+            User::unsubscribe($user->id);
         }
 
         Subscription::removeById($id);
 
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . '/admin/subscriptions/');
+        $this->redirect('/admin/subscriptions/');
     }
 }

@@ -12,7 +12,7 @@ use App\Model\Comment;
  * Class UserController
  * @package App\Controllers
  */
-class UserController
+class UserController extends AbstractAccessController
 {
     /**
      * @return View
@@ -40,7 +40,7 @@ class UserController
 
                 if (password_verify($_POST['password'], $user->password)) {
                     $_SESSION['login'] = $user->name;
-                    header('Location: /');
+                    $this->redirect('/');
                 } else {
                     $errors[] = "Пароль не верен";
                 }
@@ -60,7 +60,7 @@ class UserController
     public function logoutAction()
     {
         session_unset();
-        header('Location: /');
+        $this->redirect('/');
     }
 
     /**
@@ -114,7 +114,7 @@ class UserController
 
                 if (isset($user_id)) {
                     $_SESSION['login'] = User::getById($user_id)->name;
-                    header('Location: http://' . $_SERVER['HTTP_HOST'] . '/account/');
+                    $this->redirect('/account/');
                 }
             }
         }
@@ -127,11 +127,10 @@ class UserController
      */
     public function accountUpdatePage() : View
     {
-        $user = User::getBySession();
-        $group_description = !empty($user) ? User::getGroup($user->group_id)->description : '';
+        $group_description = !empty($this->user) ? User::getGroup($this->user->group_id)->description : '';
 
         return new View('view.account',
-            ['title' => 'Мой профиль', 'user' => $user, 'group' => $group_description]);
+            ['title' => 'Мой профиль', 'user' => $this->user, 'group' => $group_description]);
     }
 
     /**
@@ -140,10 +139,9 @@ class UserController
      */
     public function accountUpdateAction() : View
     {
-        $user = User::getBySession();
         $errors_form = [];
 
-        $group_description = $user->group_id ? User::getGroup($user->group_id)->description : '';
+        $group_description = $this->user->group_id ? User::getGroup($this->user->group_id)->description : '';
 
         $fields = [
             'name',
@@ -156,7 +154,7 @@ class UserController
 
         foreach ($fields as $field) {
 
-            if (isset($_POST[$field]) && $user->$field != $_POST[$field]) {
+            if (isset($_POST[$field]) && $this->user->$field != $_POST[$field]) {
 
                 if (($field == 'name' || $field == 'email') && empty($_POST[$field])) {
                     $errors_form[$field] = 'Это поле не может быть пустым';
@@ -178,7 +176,7 @@ class UserController
                 } else {
                     $data[$field] = strip_tags($_POST[$field]);
                     // Set subscription user is subscribed and new email not in list
-                    if ($field == 'email' && $user->subscribed == 1 && !Subscription::getByEmail($_POST[$field])) {
+                    if ($field == 'email' && $this->user->subscribed == 1 && !Subscription::getByEmail($_POST[$field])) {
                         Subscription::addNew($_POST[$field]);
                     }
                 }
@@ -187,14 +185,14 @@ class UserController
 
         if (empty($errors_form)) {
 
-            if ((isset($_POST['subscribed']) && $user->subscribed != 1)
-                || ! isset($_POST['subscribed']) && $user->subscribed == 1) {
-                $data['subscribed'] = $user->subscribed == 1 ? 0 : 1;
+            if ((isset($_POST['subscribed']) && $this->user->subscribed != 1)
+                || ! isset($_POST['subscribed']) && $this->user->subscribed == 1) {
+                $data['subscribed'] = $this->user->subscribed == 1 ? 0 : 1;
 
-                if ($user->subscribed == 1) {
-                    Subscription::removeByEmail($user->email);
-                } elseif (!Subscription::getByEmail($user->email)) {
-                    Subscription::addNew($user->email);
+                if ($this->user->subscribed == 1) {
+                    Subscription::removeByEmail($this->user->email);
+                } elseif (!Subscription::getByEmail($this->user->email)) {
+                    Subscription::addNew($this->user->email);
                 }
             }
 
@@ -209,19 +207,21 @@ class UserController
         }
 
         if (!empty($data) && empty($errors_form)) {
-            $user->update($data);
+            $this->user->update($data);
         }
 
         return new View('view.account',
-            ['title' => 'Мой профиль', 'user' => $user, 'group' => $group_description, 'errors_form' => $errors_form]);
+            ['title' => 'Мой профиль', 'user' => $this->user, 'group' => $group_description, 'errors_form' => $errors_form]);
     }
 
     /**
-     * @param string $params
+     * @param string $paramsuserList
      * @return View
      */
     public function userList(string $params = '') : View
     {
+        $this->checkAccess(10);
+
         $pagination = new Pagination('User', $params);
 
         return new View('admin.view.users', ['title' => 'Пользователи', 'users' => $pagination->getData(),
@@ -234,6 +234,8 @@ class UserController
      */
     public function userUpdatePage(int $id) : View
     {
+        $this->checkAccess(10);
+
         $account = User::getById($id);
         $account_group = User::getGroup($account->group_id);
 
@@ -319,6 +321,8 @@ class UserController
      */
     public function userAddPage() : View
     {
+        $this->checkAccess(10);
+
         return new View('admin.view.user_add',
             ['title' => 'Добавить пользователя', 'groups' => Group::getAll()]);
     }
@@ -354,7 +358,7 @@ class UserController
             $user_id = User::addNewId($data);
 
             if ($user_id) {
-                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/admin/users/' . $user_id);
+                $this->redirect('/admin/users/');
             }
         }
 
@@ -367,6 +371,8 @@ class UserController
      */
     public function userDelete(int $id)
     {
+        $this->checkAccess(10);
+
         $user = User::getById($id);
         // Remove related image files
         if (!empty($user->avatar)) {
@@ -385,6 +391,6 @@ class UserController
 
         User::removeById($id);
 
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . '/admin/users/');
+        $this->redirect('/admin/users/');
     }
 }

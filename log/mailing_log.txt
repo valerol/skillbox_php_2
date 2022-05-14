@@ -826,3 +826,39 @@ asda
 <a href="http://task.manager/unsubscribe/153cca9cdf30f7ba609937f5dce7ad57">Отписаться от рассылки</a>
 
 
+Sat May 14 9:30:56 UTC 2022
+Отправлено получателю: valerol@x-cart.com 
+
+Заголовок письма: На сайте добавлена новая запись: “test”
+Содержимое письма:
+Новая статья: “test”
+test
+<a href="http://task.manager/posts/35">Читать</a>
+-------
+<a href="http://task.manager/unsubscribe/a6fbc75cadfd3b802dd93bf20228965c">Отписаться от рассылки</a>
+
+
+Sat May 14 9:30:56 UTC 2022
+Отправлено получателю: valerol@ya.ru 
+
+Заголовок письма: На сайте добавлена новая запись: “test”
+Содержимое письма:
+Новая статья: “test”
+test
+<a href="http://task.manager/posts/35">Читать</a>
+-------
+<a href="http://task.manager/unsubscribe/153cca9cdf30f7ba609937f5dce7ad57">Отписаться от рассылки</a>
+
+
+Sat May 14 9:30:56 UTC 2022
+Отправлено получателю: luka@rambler.ru 
+
+Заголовок письма: На сайте добавлена новая запись: “test”
+Содержимое письма:
+Новая статья: “test”
+test
+<a href="http://task.manager/posts/35">Читать</a>
+-------
+<a href="http://task.manager/unsubscribe/c89b984df58a1e003d6d3d0ef8a23265">Отписаться от рассылки</a>
+
+

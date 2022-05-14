@@ -4,5 +4,5 @@
     <?php if (!empty($errors)) include VIEW_DIR . 'errors.php'; ?>
     <?php if (!empty($success)) : ?>
         <p class="list-group-item-success p-2"><?= $success ?></p>
-    <?php endif; ?>
+    <?php endif ?>
     <h1 class="title"><?= $title ?></h1>

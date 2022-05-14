@@ -9,7 +9,7 @@ use App\Model\Comment;
  * Class CommentsController
  * @package App\Controllers
  */
-class CommentsController
+class CommentsController extends AbstractAccessController
 {
     /**
      * @param string $params
@@ -17,6 +17,8 @@ class CommentsController
      */
     public function commentList(string $params = '') : View
     {
+        $this->checkAccess(5);
+
         $pagination = new Pagination('Comment', $params);
 
         return new View('admin.view.comments', ['title' => 'Комментарии', 'comments' => $pagination->getData(),
@@ -29,6 +31,8 @@ class CommentsController
      */
     public function commentUpdatePage(int $id): View
     {
+        $this->checkAccess(5);
+
         return new View('admin.view.comment', ['title' => 'Комментарий', 'comment' => Comment::getById($id)]);
     }
 
@@ -70,8 +74,10 @@ class CommentsController
      */
     public function commentDelete(int $id)
     {
+        $this->checkAccess(10);
+
         Comment::removeById($id);
 
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . '/admin/comments/');
+        $this->redirect('/admin/comments/');
     }
 }

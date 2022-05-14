@@ -8,9 +8,9 @@
                         ?>?page=<?= $i ?>&per_page=<?= $pagination->per_page ?>"><?= $i ?></a>
                     <?php else: ?>
                         <a class="page-link"><?= $i ?></a>
-                    <?php endif; ?>
+                    <?php endif ?>
                 </li>
             <?php endfor; ?>
         </ul>
     </nav>
-<?php endif; ?>
+<?php endif ?>

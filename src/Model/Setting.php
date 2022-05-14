@@ -3,10 +3,12 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Query\Builder;
 
 /**
  * Class Setting
  * @package App\Model
+ * @mixin Builder
  */
 class Setting extends Model
 {

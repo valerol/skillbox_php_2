@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $group \App\Model\Group
+ */
+?>
 <?php include VIEW_DIR . "layout/header.php"; ?>
 <?php if (!empty($user->avatar)) : ?>
 <img src="/<?= USERS_IMAGES_DIR_NAME . $user->avatar ?>">

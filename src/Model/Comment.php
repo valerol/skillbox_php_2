@@ -1,7 +1,7 @@
 <?php
 namespace App\Model;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 
@@ -20,9 +20,16 @@ class Comment extends Model
      * @param array $condition
      * @return Collection
      */
-    public static function getPaginatedByCond(int $page, int $per_page, array $condition = []) : Collection
+    public static function getPaginatedByCond(
+        int $page,
+        int $per_page,
+        array $condition = []
+    ) : Collection
     {
-        return self::where($condition)->orderByDesc('created_at')->skip($per_page * ($page - 1))->take($per_page)->get();
+        return self::where($condition)
+            ->orderByDesc('created_at')
+            ->skip($per_page * ($page - 1))
+            ->take($per_page)->get();
     }
 
     /**
@@ -61,7 +68,7 @@ class Comment extends Model
         return self::where('post_id', $post_id)->get();
     }
 
-    private function prepareComments(int $post_id, User $user = null) : Collection
+    public static function prepareComments(int $post_id, User $user = null) : Collection
     {
         if (!$user->group_id) {
             return self::leftJoin('users', 'users.id', '=', 'comments.user_id')
@@ -110,7 +117,10 @@ class Comment extends Model
      * @param int $user_id
      * @return Collection
      */
-    public static function getActiveAndPersonalByPostIdWithUser(int $post_id, int $user_id) : Collection
+    public static function getActiveAndPersonalByPostIdWithUser(
+        int $post_id,
+        int $user_id
+    ) : Collection
     {
         return self::leftJoin('users', 'users.id', '=', 'comments.user_id')
             ->select('comments.*', 'users.avatar', 'users.name')

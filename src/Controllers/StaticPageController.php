@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Exception\NotFoundException;
 use App\View\View;
 use App\Model\Page;
+use App\Service\Pagination;
 
 /**
  * Class StaticPageController
@@ -21,8 +22,11 @@ class StaticPageController extends AbstractAccessController
 
         $pagination = new Pagination('Page', $params);
 
-        return new View('admin.view.pages', ['title' => 'Страницы', 'pages' => $pagination->getData(),
-            'pagination' => $pagination]);
+        return new View('admin.view.pages', [
+            'title' => 'Страницы',
+            'pages' => $pagination->getData(),
+            'pagination' => $pagination
+        ]);
     }
 
     /**
@@ -35,7 +39,10 @@ class StaticPageController extends AbstractAccessController
 
         $page = Page::getById($id);
 
-        return new View('admin.view.page', ['title' => 'Страница', 'page' => $page]);
+        return new View('admin.view.page', [
+            'title' => 'Страница',
+            'page' => $page
+        ]);
     }
 
     /**
@@ -83,7 +90,11 @@ class StaticPageController extends AbstractAccessController
             }
         }
 
-        return new View('admin.view.page', ['title' => 'Страница', 'page' => $page, 'errors' => $errors]);
+        return new View('admin.view.page', [
+            'title' => 'Страница',
+            'page' => $page,
+            'errors' => $errors
+        ]);
     }
 
     /**
@@ -142,8 +153,11 @@ class StaticPageController extends AbstractAccessController
             }
         }
 
-        return new View('admin.view.page_add',
-            ['title' => 'Добавить страницу', 'errors' => $errors, 'errors_form' => $errors_form]);
+        return new View('admin.view.page_add', [
+            'title' => 'Добавить страницу',
+            'errors' => $errors,
+            'errors_form' => $errors_form
+        ]);
     }
 
     /**

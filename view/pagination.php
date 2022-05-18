@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $pagination \App\Service\Pagination
+ */
+?>
 <?php if ($pagination->pages_count > 1) : ?>
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">

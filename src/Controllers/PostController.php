@@ -8,6 +8,7 @@ use App\Model\Post;
 use App\Model\Subscription;
 use App\Model\Comment;
 use App\Model\Setting;
+use App\Service\Pagination;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -16,23 +17,6 @@ use Illuminate\Database\Eloquent\Collection;
  */
 class PostController extends AbstractAccessController
 {
-    /**
-     * @param $post_id
-     * @param User|null $user
-     * @return Collection
-     */
-    private function prepareComments($post_id, User $user = null) : Collection
-    {
-        if (!$user->group_id) {
-            $comments = Comment::getActiveByPostIdWithUser($post_id);
-        } elseif ($user->group_id < 5) {
-            $comments = Comment::getActiveAndPersonalByPostIdWithUser($post_id, $user->id);
-        } else {
-            $comments = Comment::getByPostIdWithUser($post_id);
-        }
-        return $comments;
-    }
-
     /**
      * @param string $params
      * @return Pagination
@@ -60,9 +44,12 @@ class PostController extends AbstractAccessController
     {
         $pagination = $this->prepareFrontendPagination($params);
 
-        return new View('view.posts',
-            ['title' => 'Записи', 'user' => $this->user, 'posts' => $pagination->getData(['active' => 1]),
-                'pagination' => $pagination]);
+        return new View('view.posts', [
+                'title' => 'Записи',
+                'user' => $this->user,
+                'posts' => $pagination->getData(['active' => 1]),
+                'pagination' => $pagination
+            ]);
     }
 
     /**
@@ -90,9 +77,14 @@ class PostController extends AbstractAccessController
             }
         }
 
-        return new View('view.posts',
-            ['title' => 'Записи', 'user' => $this->user, 'posts' => $pagination->getData(['active' => 1]),
-                'pagination' => $pagination, 'errors' => $errors, 'success' => $success]);
+        return new View('view.posts', [
+                'title' => 'Записи',
+                'user' => $this->user,
+                'posts' => $pagination->getData(['active' => 1]),
+                'pagination' => $pagination,
+                'errors' => $errors,
+                'success' => $success
+            ]);
     }
 
     /**
@@ -101,10 +93,13 @@ class PostController extends AbstractAccessController
      */
     public function postView(int $id) : View
     {
-        $comments = $this->prepareComments($id, $this->user);
+        $comments = Comment::prepareComments($id, $this->user);
 
-        return new View('view.post',
-            ['post' => Post::getById($id), 'title' => Post::getById($id)->title, 'comments' => $comments]);
+        return new View('view.post', [
+                'post' => Post::getById($id),
+                'title' => Post::getById($id)->title,
+                'comments' => $comments
+            ]);
     }
 
     /**
@@ -129,8 +124,7 @@ class PostController extends AbstractAccessController
             foreach ($fields as $field) {
 
                 if ($field == 'user_id' && empty($_POST[$field])) {
-                    $errors_form['user_id'] =
-                        ERROR_REGISTER;
+                    $errors_form['user_id'] = "Зарегистрируйтесь, чтобы иметь возможность оставить комментарий";
                     break;
                 } elseif (isset($_POST[$field])) {
 
@@ -156,10 +150,14 @@ class PostController extends AbstractAccessController
             $errors_form['text'] = 'Не заполнено поле комментария'; // Todo required fields HTML
         }
 
-        $comments = $this->prepareComments($id, $this->user);
+        $comments = Comment::prepareComments($id, $this->user);
 
-        return new View('view.post', ['post' => Post::getById($id), 'title' => Post::getById($id)->title, 'errors_form' => $errors_form,
-            'comments' => $comments]);
+        return new View('view.post', [
+            'post' => Post::getById($id),
+            'title' => Post::getById($id)->title,
+            'errors_form' => $errors_form,
+            'comments' => $comments]
+        );
     }
 
     /**
@@ -172,8 +170,11 @@ class PostController extends AbstractAccessController
 
         $pagination = new Pagination('Post', $params);
 
-        return new View('admin.view.posts', ['title' => 'Статьи', 'posts' => $pagination->getData(),
-            'pagination' => $pagination]);
+        return new View('admin.view.posts', [
+            'title' => 'Статьи',
+            'posts' => $pagination->getData(),
+            'pagination' => $pagination
+        ]);
     }
 
     /**
@@ -217,7 +218,8 @@ class PostController extends AbstractAccessController
             }
         }
 
-        if ((isset($_POST['active']) && $post->active !== 1) || (!isset($_POST['active']) && $post->active === 1)) {
+        if ((isset($_POST['active']) && $post->active !== 1) ||
+            (!isset($_POST['active']) && $post->active === 1)) {
             $data['active'] = $post->active === 1 ? 0 : 1;
         }
 
@@ -232,7 +234,11 @@ class PostController extends AbstractAccessController
 
         $post->update($data);
 
-        return new View('admin.view.post', ['title' => 'Статья', 'post' => $post, 'errors_form' => $errors_form]);
+        return new View('admin.view.post', [
+            'title' => 'Статья',
+            'post' => $post,
+            'errors_form' => $errors_form]
+        );
     }
 
     /**
@@ -299,7 +305,10 @@ class PostController extends AbstractAccessController
             $errors[] = 'Поле заголовка должно быть заполнено';
         }
 
-        return new View('admin.view.post_add', ['title' => 'Добавить статью', 'errors' => $errors]);
+        return new View('admin.view.post_add', [
+            'title' => 'Добавить статью',
+            'errors' => $errors
+        ]);
     }
 
     /**
@@ -318,11 +327,8 @@ class PostController extends AbstractAccessController
         // Remove related comments
         $comments = Comment::getByPostId($id);
 
-        if ($comments) {
-
-            foreach ($comments as $comment) {
-                Comment::removeById($comment->id);
-            }
+        foreach ($comments as $comment) {
+            Comment::removeById($comment->id);
         }
 
         Post::removeById($id);

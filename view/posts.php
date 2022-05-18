@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var $posts \Illuminate\Support\Collection
+ * @var $user \App\Model\User
+ * @var $pagination \App\Service\Pagination
+ */
+?>
 <?php include VIEW_DIR . "layout/header.php"; ?>
 <?php if (!$user->subscribed) : ?>
 <form action="" method="post">

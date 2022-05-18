@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var $pages \Illuminate\Support\Collection
+ * @var $pagination \App\Service\Pagination
+ */
+?>
 <?php include VIEW_DIR . "layout" . DIRECTORY_SEPARATOR . "admin_header.php"; ?>
 <?php include "per_page_selector.php"; ?>
 <a href="/<?= ADMIN_DIR_NAME ?>/pages/add" class="btn btn-light">Добавить</a>

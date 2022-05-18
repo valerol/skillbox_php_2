@@ -1,5 +1,10 @@
 <?php
-define('ERROR_REGISTER', '<a href="/register/">Зарегистрируйтесь</a>, чтобы иметь возможность оставить комментарий.');
+/**
+ * @var $post \App\Model\Post
+ * @var $comments \Illuminate\Support\Collection
+ */
+?>
+<?php
 include VIEW_DIR . "layout/header.php";
 ?>
 <div class="row">

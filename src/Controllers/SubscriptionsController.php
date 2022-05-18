@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\View\View;
 use App\Model\User;
 use App\Model\Subscription;
+use App\Service\Pagination;
 
 /**
  * Class SubscriptionsController
@@ -21,8 +22,11 @@ class SubscriptionsController extends AbstractAccessController
 
         $pagination = new Pagination('Subscription', $params);
 
-        return new View('admin.view.subscriptions', ['title' => 'Подписки', 'subscriptions' => $pagination->getData(),
-            'pagination' => $pagination]);
+        return new View('admin.view.subscriptions', [
+            'title' => 'Подписки',
+            'subscriptions' => $pagination->getData(),
+            'pagination' => $pagination
+        ]);
     }
 
     /**
@@ -46,7 +50,10 @@ class SubscriptionsController extends AbstractAccessController
             $errors[] = "Похоже, Вы не были подписаны";
         }
 
-        return new View('view.unsubscribe', ['title' => 'Отписка', 'errors' => $errors]);
+        return new View('view.unsubscribe', [
+            'title' => 'Отписка',
+            'errors' => $errors
+        ]);
     }
 
     /**

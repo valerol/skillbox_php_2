@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $comment \App\Model\Comment
+ */
+?>
 <?php include VIEW_DIR . "layout" . DIRECTORY_SEPARATOR . "admin_header.php"; ?>
 <form action="" method="post" enctype="multipart/form-data">
     <div class="mb-3">

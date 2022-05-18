@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $settings \Illuminate\Support\Collection
+ */
+?>
 <?php include VIEW_DIR . "layout" . DIRECTORY_SEPARATOR . "admin_header.php"; ?>
 <form action="" method="post" enctype="multipart/form-data">
     <?php foreach($settings as $setting) : // TODO вывод других вариантов инпутов реализовать по мере добавления опций ?>

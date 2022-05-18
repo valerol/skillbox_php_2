@@ -7,6 +7,7 @@ use App\Model\User;
 use App\Model\Group;
 use App\Model\Subscription;
 use App\Model\Comment;
+use App\Service\Pagination;
 
 /**
  * Class UserController
@@ -119,7 +120,10 @@ class UserController extends AbstractAccessController
             }
         }
 
-        return new View('view.register', ['title' => 'Зарегистрироваться', 'errors_form' => $errors_form]);
+        return new View('view.register', [
+            'title' => 'Зарегистрироваться',
+            'errors_form' => $errors_form
+        ]);
     }
 
     /**
@@ -127,10 +131,14 @@ class UserController extends AbstractAccessController
      */
     public function accountUpdatePage() : View
     {
-        $group_description = !empty($this->user) ? User::getGroup($this->user->group_id)->description : '';
+        $group_description = !empty($this->user) ?
+            User::getGroup($this->user->group_id)->description : '';
 
-        return new View('view.account',
-            ['title' => 'Мой профиль', 'user' => $this->user, 'group' => $group_description]);
+        return new View('view.account', [
+            'title' => 'Мой профиль',
+            'user' => $this->user,
+            'group' => $group_description
+        ]);
     }
 
     /**
@@ -141,7 +149,8 @@ class UserController extends AbstractAccessController
     {
         $errors_form = [];
 
-        $group_description = $this->user->group_id ? User::getGroup($this->user->group_id)->description : '';
+        $group_description = $this->user->group_id ?
+            User::getGroup($this->user->group_id)->description : '';
 
         $fields = [
             'name',
@@ -156,7 +165,8 @@ class UserController extends AbstractAccessController
 
             if (isset($_POST[$field]) && $this->user->$field != $_POST[$field]) {
 
-                if (($field == 'name' || $field == 'email') && empty($_POST[$field])) {
+                if (($field == 'name' || $field == 'email')
+                    && empty($_POST[$field])) {
                     $errors_form[$field] = 'Это поле не может быть пустым';
                 }
 
@@ -176,7 +186,8 @@ class UserController extends AbstractAccessController
                 } else {
                     $data[$field] = strip_tags($_POST[$field]);
                     // Set subscription user is subscribed and new email not in list
-                    if ($field == 'email' && $this->user->subscribed == 1 && !Subscription::getByEmail($_POST[$field])) {
+                    if ($field == 'email' && $this->user->subscribed == 1
+                        && !Subscription::getByEmail($_POST[$field])) {
                         Subscription::addNew($_POST[$field]);
                     }
                 }
@@ -210,8 +221,12 @@ class UserController extends AbstractAccessController
             $this->user->update($data);
         }
 
-        return new View('view.account',
-            ['title' => 'Мой профиль', 'user' => $this->user, 'group' => $group_description, 'errors_form' => $errors_form]);
+        return new View('view.account', [
+            'title' => 'Мой профиль',
+            'user' => $this->user,
+            'group' => $group_description,
+            'errors_form' => $errors_form
+        ]);
     }
 
     /**
@@ -224,8 +239,11 @@ class UserController extends AbstractAccessController
 
         $pagination = new Pagination('User', $params);
 
-        return new View('admin.view.users', ['title' => 'Пользователи', 'users' => $pagination->getData(),
-            'pagination' => $pagination]);
+        return new View('admin.view.users', [
+            'title' => 'Пользователи',
+            'users' => $pagination->getData(),
+            'pagination' => $pagination
+        ]);
     }
 
     /**
@@ -239,8 +257,12 @@ class UserController extends AbstractAccessController
         $account = User::getById($id);
         $account_group = User::getGroup($account->group_id);
 
-        return new View('admin.view.user',
-            ['title' => 'Пользователь', 'account' => $account, 'account_group' => $account_group, 'groups' => Group::getAll()]);
+        return new View('admin.view.user', [
+            'title' => 'Пользователь',
+            'account' => $account,
+            'account_group' => $account_group,
+            'groups' => Group::getAll()
+        ]);
     }
 
     /**
@@ -286,7 +308,8 @@ class UserController extends AbstractAccessController
                     $data[$field] = strip_tags($_POST[$field]);
 
                     // Set subscription user is subscribed and new email not in list
-                    if ($field == 'email' && $account->subscribed == 1 && !Subscription::getByEmail($_POST[$field])) {
+                    if ($field == 'email' && $account->subscribed == 1
+                        && !Subscription::getByEmail($_POST[$field])) {
                         Subscription::addNew($_POST[$field]);
                     }
                 }
@@ -296,7 +319,8 @@ class UserController extends AbstractAccessController
         if ((isset($_POST['subscribed']) && $account->subscribed != 1)
             || ! isset($_POST['subscribed']) && $account->subscribed == 1) {
             $data['subscribed'] = $account->subscribed == 1 ? 0 : 1;
-            $account->subscribed == 1 ? Subscription::removeByEmail($account->email) : Subscription::addNew($account->email);
+            $account->subscribed == 1 ? Subscription::removeByEmail($account->email)
+                : Subscription::addNew($account->email);
         }
 
         if (!empty($_FILES['avatar']['name'])) {
@@ -312,8 +336,12 @@ class UserController extends AbstractAccessController
             $account->update($data);
         }
 
-        return new View('admin.view.user',
-            ['title' => 'Пользователь', 'account' => $account, 'groups' => Group::getAll(), 'errors_form' => $errors_form]);
+        return new View('admin.view.user', [
+            'title' => 'Пользователь',
+            'account' => $account,
+            'groups' => Group::getAll(),
+            'errors_form' => $errors_form
+        ]);
     }
 
     /**
@@ -362,8 +390,11 @@ class UserController extends AbstractAccessController
             }
         }
 
-        return new View('admin.view.user_add',
-            ['title' => 'Добавить пользователя', 'groups' => Group::getAll(), 'errors' => $errors]);
+        return new View('admin.view.user_add', [
+            'title' => 'Добавить пользователя',
+            'groups' => Group::getAll(),
+            'errors' => $errors
+        ]);
     }
 
     /**

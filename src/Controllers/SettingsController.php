@@ -15,7 +15,10 @@ class SettingsController
      */
     public function settingList() : View
     {
-        return new View('admin.view.settings', ['title' => 'Настройки', 'settings' => Setting::getAll()]);
+        return new View('admin.view.settings', [
+            'title' => 'Настройки',
+            'settings' => Setting::getAll()
+        ]);
     }
 
     /**
@@ -34,6 +37,9 @@ class SettingsController
 
         $settings = $settings->fresh();
 
-        return new View('admin.view.settings', ['title' => 'Настройки', 'settings' => $settings]);
+        return new View('admin.view.settings', [
+            'title' => 'Настройки',
+            'settings' => $settings
+        ]);
     }
 }

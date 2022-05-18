@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\View\View;
 use App\Model\Comment;
+use App\Service\Pagination;
 
 /**
  * Class CommentsController
@@ -21,8 +22,11 @@ class CommentsController extends AbstractAccessController
 
         $pagination = new Pagination('Comment', $params);
 
-        return new View('admin.view.comments', ['title' => 'Комментарии', 'comments' => $pagination->getData(),
-            'pagination' => $pagination]);
+        return new View('admin.view.comments', [
+            'title' => 'Комментарии',
+            'comments' => $pagination->getData(),
+            'pagination' => $pagination]
+        );
     }
 
     /**
@@ -33,7 +37,10 @@ class CommentsController extends AbstractAccessController
     {
         $this->checkAccess(5);
 
-        return new View('admin.view.comment', ['title' => 'Комментарий', 'comment' => Comment::getById($id)]);
+        return new View('admin.view.comment', [
+            'title' => 'Комментарий',
+            'comment' => Comment::getById($id)
+        ]);
     }
 
     /**
@@ -58,7 +65,8 @@ class CommentsController extends AbstractAccessController
             }
         }
 
-        if ((isset($_POST['active']) && $comment->active != 1) || (!isset($_POST['active']) && $comment->active == 1)) {
+        if ((isset($_POST['active']) && $comment->active != 1) ||
+            (!isset($_POST['active']) && $comment->active == 1)) {
             $data['active'] = $comment->active == 1 ? 0 : 1;
         }
 
@@ -66,7 +74,10 @@ class CommentsController extends AbstractAccessController
             $comment->update($data);
         }
 
-        return new View('admin.view.comment', ['title' => 'Комментарий', 'comment' => $comment]);
+        return new View('admin.view.comment', [
+            'title' => 'Комментарий',
+            'comment' => $comment]
+        );
     }
 
     /**

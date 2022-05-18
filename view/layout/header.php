@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $title string
+ */
+?>
 <?php include VIEW_DIR . "layout/base/header.php"; ?>
 <?php include VIEW_DIR . "menu.php"; ?>
 <div class="container">

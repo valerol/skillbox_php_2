@@ -74,7 +74,8 @@ function fake_mail($subscriber, $data)
     if ($fo) fwrite($fo, $message);
 }
 
-function string_lenght_control($string, $length = 200) {
+function string_lenght_control($string, $length = 200)
+{
 
     if (strlen($string) > $length) {
         return substr($string, 0, $length-3) . '...';

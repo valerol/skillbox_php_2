@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $groups \Illuminate\Support\Collection
+ */
+?>
 <?php include VIEW_DIR . "layout" . DIRECTORY_SEPARATOR . "admin_header.php"; ?>
 <form action="/<?= ADMIN_DIR_NAME ?>/users/add/" method="post" enctype="multipart/form-data">
     <div class="mb-3">

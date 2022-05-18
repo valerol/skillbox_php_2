@@ -3,11 +3,12 @@
  * Я в курсе, что в Laravel есть пагинатор, но возникли проблемы с вызовом шаблона в методе links(),
  * сходу не разобралась, может библиотеки какой-то не хватает, поэтому написала свой
  */
-namespace App\Controllers;
+namespace App\Service;
 
 use App\View\View;
 use App\View\Renderable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Pagination
@@ -15,6 +16,9 @@ use Illuminate\Database\Eloquent\Collection;
  */
 class Pagination implements Renderable
 {
+    /**
+     * @var Model
+     */
     private $model;
     public $pages_count = 1;
     public $page = 1;
@@ -40,14 +44,14 @@ class Pagination implements Renderable
      */
     private function prepareParams(string $params)
     {
-        parse_str(str_replace('?', '', $params), $params);
+        parse_str(str_replace('?', '', $params), $params_arr);
 
-        if (isset($params['page'])) {
-            $this->page = $params['page'];
+        if (isset($params_arr['page'])) {
+            $this->page = $params_arr['page'];
         }
 
-        if (isset($params['per_page'])) {
-            $this->per_page = $params['per_page'];
+        if (isset($params_arr['per_page'])) {
+            $this->per_page = $params_arr['per_page'];
         }
     }
 

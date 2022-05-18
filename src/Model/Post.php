@@ -1,7 +1,7 @@
 <?php
 namespace App\Model;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 
@@ -28,9 +28,14 @@ class Post extends Model
      * @param array $condition
      * @return Collection
      */
-    public static function getPaginatedByCond(int $page, int $per_page, array $condition = []) : Collection
+    public static function getPaginatedByCond(
+        int $page,
+        int $per_page,
+        array $condition = []
+    ) : Collection
     {
-        return self::where($condition)->orderByDesc('created_at')->skip($per_page * ($page - 1))->take($per_page)->get();
+        return self::where($condition)->orderByDesc('created_at')
+            ->skip($per_page * ($page - 1))->take($per_page)->get();
     }
 
     /**

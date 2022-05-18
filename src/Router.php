@@ -17,11 +17,10 @@ class Router
     /**
      * @param string $path
      * @param array $callback
-     * @param int $group_id
      */
-    public function get(string $path, array $callback, $group_id = 0)
+    public function get(string $path, array $callback)
     {
-        $this->addRoute('get', $path, $callback, $group_id);
+        $this->addRoute('get', $path, $callback);
     }
 
     /**
@@ -37,28 +36,10 @@ class Router
      * @param string $method
      * @param string $path
      * @param array $callback
-     * @param int $group_id
      */
-    private function addRoute(string $method, string $path, array $callback, int $group_id = 0)
+    private function addRoute(string $method, string $path, array $callback)
     {
-        $this->routes[] = new Route($method, $path, $callback, $group_id);
-    }
-
-    /**
-     * @param Route $route
-     * @return bool|void
-     */
-    private function checkAccess(Route $route) {
-
-        if ($route->group_id == 0) {
-            return true;
-        } elseif (isset($_SESSION['login'])) {
-            $user = User::where('name', $_SESSION['login'])->first();
-
-            if ($user) {
-                return $route->group_id <= $user->group_id;
-            }
-        } else return;
+        $this->routes[] = new Route($method, $path, $callback);
     }
 
     /**
@@ -76,10 +57,6 @@ class Router
         foreach ($this->routes as $route) {
 
             if ($route->match($uri, $method)) {
-
-                if (!$this->checkAccess($route)) {
-                    throw new AccessDeniedException();
-                }
                 return $route->run($uri);
             }
         }

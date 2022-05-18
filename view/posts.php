@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var $posts \Illuminate\Support\Collection
+ * @var $user \App\Model\User
+ * @var $pagination \App\Service\Pagination
+ */
+?>
 <?php include VIEW_DIR . "layout/header.php"; ?>
 <?php if (!$user->subscribed) : ?>
 <form action="" method="post">
@@ -6,14 +13,14 @@
         <button type="submit" name="submit" class="btn btn-primary">Подписаться</button>
     </div>
 </form>
-<?php endif; ?>
+<?php endif ?>
 
 <?php foreach($posts as $post): ?>
 <div class="row">
     <div class="col-3">
         <?php if ($post->image) : ?>
         <img src="<?= '/' . POST_IMAGES_DIR_NAME . $post->image ?>" alt="<?= $post->title ?>">
-        <?php endif; ?>
+        <?php endif ?>
     </div>
     <div class="col">
         <h2><a href="/post/<?= $post->id ?>"><?= $post->title ?></a></h2>

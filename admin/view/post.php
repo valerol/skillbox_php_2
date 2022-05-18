@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $post \App\Model\Post
+ */
+?>
 <?php include VIEW_DIR . "layout" . DIRECTORY_SEPARATOR . "admin_header.php"; ?>
 <form action="" method="post" enctype="multipart/form-data">
     <div class="mb-3">

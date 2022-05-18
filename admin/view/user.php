@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $groups \Illuminate\Support\Collection
+ */
+?>
 <?php include VIEW_DIR . "layout" . DIRECTORY_SEPARATOR . "admin_header.php"; ?>
 <?php if (!empty($account->avatar)) : ?>
     <img src="/<?= USERS_IMAGES_DIR_NAME . $account->avatar ?>">

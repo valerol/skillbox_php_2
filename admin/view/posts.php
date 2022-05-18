@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var $posts \Illuminate\Support\Collection
+ * @var $pagination \App\Service\Pagination
+ */
+?>
 <?php include VIEW_DIR . "layout" . DIRECTORY_SEPARATOR . "admin_header.php"; ?>
 <a href="/admin/posts/add" class="btn btn-light">Добавить статью</a>
 <?php include "per_page_selector.php"; ?>

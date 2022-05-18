@@ -1,3 +1,8 @@
+<?php
+/**
+ * @var $page \App\Model\Page
+ */
+?>
 <?php include VIEW_DIR . "layout" . DIRECTORY_SEPARATOR . "header.php"; ?>
 <div class="card">
     <div class="card-body">

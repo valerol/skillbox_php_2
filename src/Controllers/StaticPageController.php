@@ -4,12 +4,13 @@ namespace App\Controllers;
 use App\Exception\NotFoundException;
 use App\View\View;
 use App\Model\Page;
+use App\Service\Pagination;
 
 /**
  * Class StaticPageController
  * @package App\Controllers
  */
-class StaticPageController
+class StaticPageController extends AbstractAccessController
 {
     /**
      * @param string $params
@@ -17,10 +18,15 @@ class StaticPageController
      */
     public function pageList(string $params = '') : View
     {
+        $this->checkAccess(10);
+
         $pagination = new Pagination('Page', $params);
 
-        return new View('admin.view.pages', ['title' => 'Страницы', 'pages' => $pagination->getData(),
-            'pagination' => $pagination]);
+        return new View('admin.view.pages', [
+            'title' => 'Страницы',
+            'pages' => $pagination->getData(),
+            'pagination' => $pagination
+        ]);
     }
 
     /**
@@ -29,9 +35,14 @@ class StaticPageController
      */
     public function pageUpdatePage(string $id) : View
     {
+        $this->checkAccess(10);
+
         $page = Page::getById($id);
 
-        return new View('admin.view.page', ['title' => 'Страница', 'page' => $page]);
+        return new View('admin.view.page', [
+            'title' => 'Страница',
+            'page' => $page
+        ]);
     }
 
     /**
@@ -79,7 +90,11 @@ class StaticPageController
             }
         }
 
-        return new View('admin.view.page', ['title' => 'Страница', 'page' => $page, 'errors' => $errors]);
+        return new View('admin.view.page', [
+            'title' => 'Страница',
+            'page' => $page,
+            'errors' => $errors
+        ]);
     }
 
     /**
@@ -87,6 +102,8 @@ class StaticPageController
      */
     public function pageAddPage() : View
     {
+        $this->checkAccess(10);
+
         return new View('admin.view.page_add', ['title' => 'Добавить страницу']);
     }
 
@@ -130,14 +147,17 @@ class StaticPageController
             $page_id = Page::addNewId($data);
 
             if ($page_id) {
-                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/admin/pages/' . $page_id);
+                $this->redirect('/admin/pages/');
             } else {
                 $errors[] = "Произошла какая-то ошибка";
             }
         }
 
-        return new View('admin.view.page_add',
-            ['title' => 'Добавить страницу', 'errors' => $errors, 'errors_form' => $errors_form]);
+        return new View('admin.view.page_add', [
+            'title' => 'Добавить страницу',
+            'errors' => $errors,
+            'errors_form' => $errors_form
+        ]);
     }
 
     /**
@@ -161,8 +181,10 @@ class StaticPageController
      */
     public function pageDelete(int $id)
     {
+        $this->checkAccess(10);
+
         Page::removeById($id);
 
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . '/admin/pages/');
+        $this->redirect('/admin/pages/');
     }
 }

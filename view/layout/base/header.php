@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var $title string
+ * @var $view \App\View\View
+ */
+?>
 <!doctype html>
 <html lang="en">
     <head>

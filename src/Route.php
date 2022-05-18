@@ -12,20 +12,17 @@ class Route
     private string $method;
     private string $path;
     private Closure $callback;
-    public int $group_id;
 
     /**
      * Route constructor.
      * @param string $method
      * @param string $path
      * @param array $callback
-     * @param int $group_id
      */
-    public function __construct(string $method, string $path, array $callback, int $group_id)
+    public function __construct(string $method, string $path, array $callback)
     {
         $this->method   = $method;
         $this->path     = $path;
-        $this->group_id  = $group_id;
         $this->callback = $this->prepareCallback($callback);
     }
 

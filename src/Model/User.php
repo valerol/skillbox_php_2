@@ -3,10 +3,12 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Query\Builder;
 
 /**
  * Class User
  * @package App\Model
+ * @mixin Builder
  */
 class User extends Model
 {
@@ -26,9 +28,14 @@ class User extends Model
      * @param array $condition
      * @return Collection
      */
-    public static function getPaginatedByCond(int $page, int $per_page, array $condition = []) : Collection
+    public static function getPaginatedByCond(
+        int $page,
+        int $per_page,
+        array $condition = []
+    ) : Collection
     {
-        return self::where($condition)->orderByDesc('created_at')->skip($per_page * ($page - 1))->take($per_page)->get();
+        return self::where($condition)->orderByDesc('created_at')
+            ->skip($per_page * ($page - 1))->take($per_page)->get();
     }
 
     /**
@@ -90,12 +97,20 @@ class User extends Model
 
     /**
      * @param int $user_id
-     * @param int|null $status
      * @return bool
      */
-    public static function setSubscribed(int $user_id, int $status = 1) : bool
+    public static function subscribe(int $user_id) : bool
     {
-        return self::where('id', $user_id)->update(['subscribed' => $status]);
+        return self::where('id', $user_id)->update(['subscribed' => 1]);
+    }
+
+    /**
+     * @param int $user_id
+     * @return bool
+     */
+    public static function unsubscribe(int $user_id) : bool
+    {
+        return self::where('id', $user_id)->update(['subscribed' => 0]);
     }
 
     /**

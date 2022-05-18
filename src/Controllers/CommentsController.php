@@ -4,12 +4,13 @@ namespace App\Controllers;
 
 use App\View\View;
 use App\Model\Comment;
+use App\Service\Pagination;
 
 /**
  * Class CommentsController
  * @package App\Controllers
  */
-class CommentsController
+class CommentsController extends AbstractAccessController
 {
     /**
      * @param string $params
@@ -17,10 +18,15 @@ class CommentsController
      */
     public function commentList(string $params = '') : View
     {
+        $this->checkAccess(5);
+
         $pagination = new Pagination('Comment', $params);
 
-        return new View('admin.view.comments', ['title' => 'Комментарии', 'comments' => $pagination->getData(),
-            'pagination' => $pagination]);
+        return new View('admin.view.comments', [
+            'title' => 'Комментарии',
+            'comments' => $pagination->getData(),
+            'pagination' => $pagination]
+        );
     }
 
     /**
@@ -29,7 +35,12 @@ class CommentsController
      */
     public function commentUpdatePage(int $id): View
     {
-        return new View('admin.view.comment', ['title' => 'Комментарий', 'comment' => Comment::getById($id)]);
+        $this->checkAccess(5);
+
+        return new View('admin.view.comment', [
+            'title' => 'Комментарий',
+            'comment' => Comment::getById($id)
+        ]);
     }
 
     /**
@@ -54,7 +65,8 @@ class CommentsController
             }
         }
 
-        if ((isset($_POST['active']) && $comment->active != 1) || (!isset($_POST['active']) && $comment->active == 1)) {
+        if ((isset($_POST['active']) && $comment->active != 1) ||
+            (!isset($_POST['active']) && $comment->active == 1)) {
             $data['active'] = $comment->active == 1 ? 0 : 1;
         }
 
@@ -62,7 +74,10 @@ class CommentsController
             $comment->update($data);
         }
 
-        return new View('admin.view.comment', ['title' => 'Комментарий', 'comment' => $comment]);
+        return new View('admin.view.comment', [
+            'title' => 'Комментарий',
+            'comment' => $comment]
+        );
     }
 
     /**
@@ -70,8 +85,10 @@ class CommentsController
      */
     public function commentDelete(int $id)
     {
+        $this->checkAccess(10);
+
         Comment::removeById($id);
 
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . '/admin/comments/');
+        $this->redirect('/admin/comments/');
     }
 }

@@ -50,6 +50,10 @@ img {
     max-width: 100px;
 }
 
+.admin-view-user img {
+    max-width: 300px;
+}
+
 .view-post h2 {
     margin-top: 30px;
 }

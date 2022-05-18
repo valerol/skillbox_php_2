@@ -8,31 +8,15 @@ use App\Model\Post;
 use App\Model\Subscription;
 use App\Model\Comment;
 use App\Model\Setting;
+use App\Service\Pagination;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class PostController
  * @package App\Controllers
  */
-class PostController
+class PostController extends AbstractAccessController
 {
-    /**
-     * @param $post_id
-     * @param User|null $user
-     * @return Collection
-     */
-    private function prepareComments($post_id, User $user = null) : Collection
-    {
-        if (!$user->group_id) {
-            $comments = Comment::getActiveByPostIdWithUser($post_id);
-        } elseif ($user->group_id < 5) {
-            $comments = Comment::getActiveAndPersonalByPostIdWithUser($post_id, $user->id);
-        } else {
-            $comments = Comment::getByPostIdWithUser($post_id);
-        }
-        return $comments;
-    }
-
     /**
      * @param string $params
      * @return Pagination
@@ -58,13 +42,14 @@ class PostController
      */
     public function postList(string $params = '') : View
     {
-        $user = User::getBySession();
-
         $pagination = $this->prepareFrontendPagination($params);
 
-        return new View('view.posts',
-            ['title' => 'Записи', 'user' => $user, 'posts' => $pagination->getData(['active' => 1]),
-                'pagination' => $pagination]);
+        return new View('view.posts', [
+                'title' => 'Записи',
+                'user' => $this->user,
+                'posts' => $pagination->getData(['active' => 1]),
+                'pagination' => $pagination
+            ]);
     }
 
     /**
@@ -73,8 +58,6 @@ class PostController
      */
     public function postSubscribeAction(string $params = '') : View
     {
-        $user = User::getBySession();
-
         $errors = [];
 
         $success = '';
@@ -83,10 +66,8 @@ class PostController
 
         if (isset($_POST['email'])) {
 
-            if ($user && $user->email) {
-                User::setSubscribed($user->id);
-                $user = $user->fresh();
-            }
+            User::subscribe($this->user->id);
+            $this->user->fresh();
 
             try {
                 Subscription::addNew($_POST['email']);
@@ -96,9 +77,14 @@ class PostController
             }
         }
 
-        return new View('view.posts',
-            ['title' => 'Записи', 'user' => $user, 'posts' => $pagination->getData(['active' => 1]),
-                'pagination' => $pagination, 'errors' => $errors, 'success' => $success]);
+        return new View('view.posts', [
+                'title' => 'Записи',
+                'user' => $this->user,
+                'posts' => $pagination->getData(['active' => 1]),
+                'pagination' => $pagination,
+                'errors' => $errors,
+                'success' => $success
+            ]);
     }
 
     /**
@@ -107,12 +93,13 @@ class PostController
      */
     public function postView(int $id) : View
     {
-        $user = User::getBySession() ?: NULL;
+        $comments = Comment::prepareComments($id, $this->user);
 
-        $comments = $this->prepareComments(intval($id), $user);
-
-        return new View('view.post',
-            ['post' => Post::getById($id), 'comments' => $comments]);
+        return new View('view.post', [
+                'post' => Post::getById($id),
+                'title' => Post::getById($id)->title,
+                'comments' => $comments
+            ]);
     }
 
     /**
@@ -122,8 +109,6 @@ class PostController
     public function postCommentActionAdd(int $id) : View
     {
         $errors_form = [];
-
-        $user = User::getBySession() ?: [];
 
         $data = [];
 
@@ -139,8 +124,7 @@ class PostController
             foreach ($fields as $field) {
 
                 if ($field == 'user_id' && empty($_POST[$field])) {
-                    $errors_form['user_id'] =
-                        '<a href="/register/">Зарегистрируйтесь</a>, чтобы иметь возможность оставить комментарий.';
+                    $errors_form['user_id'] = "Зарегистрируйтесь, чтобы иметь возможность оставить комментарий";
                     break;
                 } elseif (isset($_POST[$field])) {
 
@@ -166,10 +150,14 @@ class PostController
             $errors_form['text'] = 'Не заполнено поле комментария'; // Todo required fields HTML
         }
 
-        $comments = $this->prepareComments(intval($id), $user);
+        $comments = Comment::prepareComments($id, $this->user);
 
-        return new View('view.post', ['post' => Post::getById($id), 'errors_form' => $errors_form,
-            'comments' => $comments]);
+        return new View('view.post', [
+            'post' => Post::getById($id),
+            'title' => Post::getById($id)->title,
+            'errors_form' => $errors_form,
+            'comments' => $comments]
+        );
     }
 
     /**
@@ -178,10 +166,15 @@ class PostController
      */
     public function postListAdmin(string $params = '') : View
     {
+        $this->checkAccess(5);
+
         $pagination = new Pagination('Post', $params);
 
-        return new View('admin.view.posts', ['title' => 'Статьи', 'posts' => $pagination->getData(),
-            'pagination' => $pagination]);
+        return new View('admin.view.posts', [
+            'title' => 'Статьи',
+            'posts' => $pagination->getData(),
+            'pagination' => $pagination
+        ]);
     }
 
     /**
@@ -190,6 +183,8 @@ class PostController
      */
     public function postUpdatePage(int $id) : View
     {
+        $this->checkAccess(5);
+
         $post = Post::getById($id);
 
         return new View('admin.view.post', ['title' => 'Статья', 'post' => $post]);
@@ -223,7 +218,8 @@ class PostController
             }
         }
 
-        if ((isset($_POST['active']) && $post->active !== 1) || (!isset($_POST['active']) && $post->active === 1)) {
+        if ((isset($_POST['active']) && $post->active !== 1) ||
+            (!isset($_POST['active']) && $post->active === 1)) {
             $data['active'] = $post->active === 1 ? 0 : 1;
         }
 
@@ -238,7 +234,11 @@ class PostController
 
         $post->update($data);
 
-        return new View('admin.view.post', ['title' => 'Статья', 'post' => $post, 'errors_form' => $errors_form]);
+        return new View('admin.view.post', [
+            'title' => 'Статья',
+            'post' => $post,
+            'errors_form' => $errors_form]
+        );
     }
 
     /**
@@ -246,6 +246,8 @@ class PostController
      */
     public function postAddPage() : View
     {
+        $this->checkAccess(5);
+
         return new View('admin.view.post_add', ['title' => 'Добавить статью']);
     }
 
@@ -294,7 +296,7 @@ class PostController
                     fake_mail($subscriber, Post::getById($post_id));
                 }
 
-                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/admin/post/' . $post_id);
+                $this->redirect('/admin/post/');
             } else {
                 $errors[] = "Произошла какая-то ошибка";
             }
@@ -303,7 +305,10 @@ class PostController
             $errors[] = 'Поле заголовка должно быть заполнено';
         }
 
-        return new View('admin.view.post_add', ['title' => 'Добавить статью', 'errors' => $errors]);
+        return new View('admin.view.post_add', [
+            'title' => 'Добавить статью',
+            'errors' => $errors
+        ]);
     }
 
     /**
@@ -311,6 +316,8 @@ class PostController
      */
     public function postDelete(int $id)
     {
+        $this->checkAccess(5);
+
         $post = Post::getById($id);
         // Remove related image files
         if (!empty($post->image)) {
@@ -320,15 +327,12 @@ class PostController
         // Remove related comments
         $comments = Comment::getByPostId($id);
 
-        if ($comments) {
-
-            foreach ($comments as $comment) {
-                Comment::removeById($comment->id);
-            }
+        foreach ($comments as $comment) {
+            Comment::removeById($comment->id);
         }
 
         Post::removeById($id);
 
-        header('Location: http://' . $_SERVER['HTTP_HOST'] . '/admin/posts/');
+        $this->redirect('/admin/posts/');
     }
 }

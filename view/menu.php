@@ -41,12 +41,12 @@ $current_uri = $_SERVER['REQUEST_URI'];
                     <li class="nav-item">
                         <a class="nav-link" href="/admin">Админка</a>
                     </li>
-                <?php endif; ?>
+                <?php endif ?>
 
             <li class="nav-item">
                 <a class="nav-link" href="/logout">Выйти</a>
             </li>
-            <?php endif; ?>
+            <?php endif ?>
         </ul>
     </div>
 </nav>
